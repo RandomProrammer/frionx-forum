@@ -1,4 +1,4 @@
-body {
+body, input, textarea, button {
   margin: 0;
   font-family: 'Roboto', sans-serif;
   background: #0d1117;
@@ -27,12 +27,12 @@ body {
 
 
 .main-nav .navlink:hover {
-  background: #292929;
+  color: #f9f9f9;
 }
 
 .main-nav .navlink.active {
-  color: #fff;
-  background: #282828;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 
@@ -196,6 +196,7 @@ body {
 }
 
 .display-heading{
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.5);
   font-size: 80px;
 }
 
@@ -316,4 +317,85 @@ body {
 
 .fa-caret-down:hover{
   background-color: #202020;
+}
+
+.disabled{
+  background-color: #30363d;
+}
+
+.forum-create-thread{
+  width: calc(100% - 20px);
+  height: auto;
+  border: 2px solid #30363d;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.forum-header-split{
+  color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.forum-form-header {
+  display: block;
+  font-size: 1.12rem;
+  margin: 8px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.forum-input-text {
+  width: calc(100% - 12px);
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: none;
+  font-size: 14px;
+  color: white;
+  outline: 0;
+}
+
+.btn-submit {
+  background: #238636;
+  border: 2px solid #2ea043;
+  padding: 12px 32px;
+}
+.btn-submit:hover{
+  background: #2ea043;
+  border: 2px solid #3fb950;
+  padding: 12px 32px;
+}
+
+.forum-input-text:hover {
+  border: 1px solid rgb(255, 255, 255, 0.5);
+}
+
+.forum-input-text:focus {
+  border: 1px solid rgb(0, 140, 255);
+  box-shadow: 0 0 0 4px rgba(0, 140, 255, 0.5);
+}
+
+.forum-input-textarea {
+  width: calc(100%);
+  min-height: 300px;
+  height: 300px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: none;
+  font-size: 14px; 
+  box-sizing: border-box;
+  color: white;
+  max-width: 100%;
+  min-width: 100%;
+  outline: 0;
+}
+
+.forum-input-textarea:hover {
+  border: 1px solid rgb(255, 255, 255, 0.5);
+}
+
+.forum-input-textarea:focus {
+  border: 1px solid rgb(0, 140, 255);
+  box-shadow: 0 0 0 4px rgba(0, 140, 255, 0.5);
 }

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include("temp/head", { title: "Frionx Forum" }) %>
+</head>
+<body>
+  <nav class="main-nav">
+    <span class="forum-title">Frionx Forum</span>
+    <a href="./" class="navlink">Home</a>
+    <a class="navlink active">Create Thread</a>
+    <a id="btn-login" class="navlink right blue frm-btn">Log in</a>
+    <a id="btn-signup" class="navlink right black frm-btn">Signup</a>
+    <a id="btn-logout" class="navlink right black frm-btn hidden">Logout</a>
+  </nav>
+  <!-- Authentication Forms -->
+  <div id="form-login" class="form-login login">
+    <label class="form-label">Username</label>
+    <input id="txt-login-username" type="username" class="form-input">
+    <label class="form-label">Password</label>
+    <input id = "txt-login-password" type="password" class="form-input">
+    <button id="btn-form-login" class="form-button">Login</button>
+    <p class="status" id="login-status"></p>
+  </div>
+  <div id="form-signup" class="form-login signup">
+    <label class="form-label">Username</label>
+    <input id="txt-form-username" type="username" class="form-input">
+    <label class="form-label">Password</label>
+    <input id="txt-form-password" type="password" class="form-input">
+    <label class="form-label">Confirm Password</label>
+    <input id="txt-form-confirm-password" type="password" class="form-input">
+    <button id="btn-form-signup" class="form-button">Signup</button>
+    <p class="status" id="register-status"></p>
+  </div>
+  <div class="forum-background">
+    <h1 class="display-heading">Welcome to Frionx Forums</h1>
+  </div>
+  <div class="forum-content-box forums">
+    <div class="forums-top">
+      <label class="font-large">Forums</label><button class="btn create-forum right plus-btn disabled" disabled><i class="fas fa-plus"></i> Create Thread</button>
+    </div>
+    <form id="create-thread-form">
+    <div class="forum-create-thread">
+      <label class="forum-form-header">Thread Title</label>
+      <input id="thread-title" class="forum-input-text" placeholder="Thread Title" required>
+      <label class="forum-form-header">Thread Content</label>
+      <textarea id="thread-content" class="forum-input-textarea" placeholder="I am writing about..."></textarea>
+      <hr class="forum-header-split">
+      <input type="submit" id="thread-submit" class="btn btn-submit" value="Submit">
+    </div>
+    </form>
+  </div>
+  <!-- Important Site Scripts -->
+  <script src="create-thread.js"></script>
+</body>
+</html>
