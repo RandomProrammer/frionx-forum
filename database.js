@@ -41,3 +41,7 @@ databaseManager.insertRow = function(database, sql, params){
 }
 
 module.exports = databaseManager;
+
+function addForumCategory(forumName){
+  
+}

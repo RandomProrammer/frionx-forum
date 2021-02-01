@@ -1,6 +1,10 @@
 let showLogin = false;
 let showSignup = false;
 $("#btn-login").click(function(){
+  if (showSignup){
+    document.getElementById("form-signup").style.display = "none";
+    showSignup = false;
+  }
   if (showLogin != true){
     document.getElementById("form-login").style.display = "block";
     showLogin = true;
@@ -12,6 +16,10 @@ $("#btn-login").click(function(){
 });
 
 $("#btn-signup").click(function(){
+  if (showLogin){
+    document.getElementById("form-login").style.display = "none";
+    showLogin = false;
+  }
   if (showSignup != true){
     document.getElementById("form-signup").style.display = "block";
     showSignup = true;
@@ -37,6 +45,7 @@ $("#btn-form-signup").click(function(){
         confirm_password: confirm_password
       })
   }).then(function(e){
+    console.log(e);
     switch (e.status){
       case 400:
         $("#register-status").text("Incorrect form input sent.");
@@ -64,6 +73,18 @@ $("#btn-form-login").click(function(){
         password: password
       })
   }).then(function(e){
+    e.json().then(data=>{
+      if (data.success){
+        $("#login-status").text("Successfully logged in!");
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+        setTimeout(window.location.reload(), 1000);
+      }
+      else{
+        $("#login-status").text(data.error);
+      }
+    });
+    /*
     switch(e.status){
       case 200:
         $("#login-status").text("Successfully logged in!");
@@ -77,6 +98,7 @@ $("#btn-form-login").click(function(){
       default:
         break;
     }
+    */
   });
 });
 
@@ -109,3 +131,25 @@ $("#btn-logout").click(function(){
   localStorage.removeItem('password');
   window.location.reload();
 });
+
+// Quick hide Drop down code
+let dropDowns = document.getElementsByClassName("fas fa-caret-down");
+for (let i = 0; i < dropDowns.length; i++){
+    dropDowns[i].parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0].style.display = "block";
+    let dropDown = dropDowns[i];
+    dropDown.onclick = function(){
+      if (dropDown.getAttribute("class") == "fas fa-caret-down"){
+        dropDown.setAttribute('class', 'fas fa-caret-right block-border');
+      }
+      else{
+        dropDown.setAttribute('class', 'fas fa-caret-down');
+      }
+      let element = dropDown.parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0];
+      if (element.style.display == "block"){
+        element.style.display = "none";
+      }
+      else if (element.style.display == "none"){
+        element.style.display = "block";
+      }
+    }
+}

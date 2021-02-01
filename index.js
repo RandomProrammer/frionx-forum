@@ -52,27 +52,44 @@ app.post("/api/v1/signup", (req, res) => {
   else{
     if (username.includes(" ")){
       res.status(400);
-      res.send({success: false, error: 'Passwords do not match.'});
+      res.send({success: false, error: 'Username has spaces.'});
     }
     else{
-      var db = new sqlite3.Database('./database/users.db');
-      db.all("SELECT * FROM users WHERE username=?", [req.body.username], function(err, rows) {
-       if (rows.length >= 1){
-        res.status(250);
-        res.send({success: false, error: 'username already taken.'});
-       }
-       else{
-        if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [req.body.username, req.body.password])){
-          res.status(200);
-          res.send({success: true});
+      let tmp_password = password;
+      tmp_password = tmp_password.replace(" ", "");
+      if (tmp_password.length < 6){
+        res.status(400);
+        res.send({success: false, error: 'Incorrect password length.'});
+        return;
+      }
+      else{
+        let tmp_username = username;
+        tmp_username = tmp_username.replace(" ", "");
+        if (tmp_username.length < 3){
+          res.status(400);
+          res.send({success: false, error: 'incorrect username format.'});
         }
         else{
-          res.status(500);
-          res.send({success: false, error: "Couldn't register account successfully"});
+          var db = new sqlite3.Database('./database/users.db');
+          db.all("SELECT * FROM users WHERE username=?", [req.body.username], function(err, rows) {
+          if (rows.length >= 1){
+            res.status(250);
+            res.send({success: false, error: 'username already taken.'});
+          }
+          else{
+            if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [req.body.username, req.body.password])){
+              res.status(200);
+              res.send({success: true});
+            }
+            else{
+              res.status(500);
+              res.send({success: false, error: "Couldn't register account successfully"});
+            }
+          }
+          });	
+          db.close();
         }
-       }
-      });	
-      db.close();
+      }
     }
   }
 });
