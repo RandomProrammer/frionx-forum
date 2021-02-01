@@ -1,0 +1,150 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+.main-nav {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  background-color: #333;
+  overflow: hidden;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+
+.main-nav .navlink {
+  font-weight: lighter;
+  padding: 10px;
+  float: left;
+  text-decoration: none;
+  height: 24px;
+  color: #888;
+}
+
+
+.main-nav .navlink:hover {
+  background: #292929;
+}
+
+.main-nav .navlink.active {
+  color: #fff;
+  background: #282828;
+}
+
+
+.main-nav .right {
+  float: right;
+}
+
+
+.main-nav .blue {
+  background-color: #038cfc;
+  color: white;
+}
+
+.main-nav .blue:hover {
+  background-color: #005499;
+}
+
+.main-nav .black {
+  background-color: #202020;
+  color: white;
+}
+
+.main-nav .black:hover{
+  background-color: #101010;
+  color: white;
+}
+
+
+.main-nav .btn {
+  margin: 4px;
+  height: 16px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.forum-title {
+  float: left;
+  color: white;
+  font-size: 2rem;
+  margin: 0 16px;
+  text-align: center;
+}
+
+.form-login{
+  box-sizing: border-box;
+  background-color: #333;
+  padding: 6px;
+  padding-top: 10px;
+  padding-bottom: 3;
+  position: absolute;
+  top: 50px;
+  width: 300px;
+  height: auto;
+}
+
+.form-label{
+  color: white;
+  float: left;
+  width: 98%;
+  margin-bottom: 3px;
+}
+
+.form-input{
+  float: left;
+  font-size: 16px;
+  outline: none;
+  width: 98%;
+  border-radius: 3px;
+  border: none;
+  color: black;
+  margin-bottom: 3px;
+}
+
+.form-input:focus{
+  border: 2px solid black;
+}
+
+.form-button {
+  border: none;
+  border-radius: 3px;
+  background-color: #038cfc;
+  color: white;
+  outline: none;
+  font-size: 16px;
+  padding: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+.form-button:hover{
+  background-color: #005499;
+}
+
+.login{
+  right: 10px;
+  display: none;
+}
+
+.signup{
+  right: 60px;
+  display: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .forum-title{
+    display: none;
+  }
+}
+
+.status{
+  color: white;
+  font-size: 12px;
+}
+
+.hidden{
+  display: none;
+}
