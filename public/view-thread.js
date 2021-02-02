@@ -137,28 +137,12 @@ $("#btn-logout").click(function(){
   localStorage.removeItem('password');
   window.location.reload();
 });
-/*
-   <div class="forum-block-container">
-        <div class="forum-block"> Programming Subforums</div>
-        <div class="forum-block-bottom">
-          cry
-        </div>
-      </div>
-*/
-function addForum(forumId, forumName){
-  let forumBlock = document.createElement('div');
-  forumBlock.setAttribute('class', 'forum-block');
-  let innerText = document.createElement('a');
-  innerText.setAttribute('class', 'forum-block-header-link');
-  innerText.setAttribute('href', '/view-thread/'+forumId);
-  innerText.innerText = forumName;
-  forumBlock.append(innerText)
-  document.getElementById("forum-container").append(forumBlock);
-}
 
-$.get("./api/v1/get-all-threads").then(e=>{
-  e.threads.forEach(function(obj){
-    console.log(obj);
-    addForum(obj.id, obj.title);
-  });
+/*
+        <label class="forum-form-header" id="thread-title"></label>
+        <textarea id="thread-content" class="forum-input-textarea" readonly></textarea>
+        */
+$.get(`../api/v1/get-thread-info/${threadId}`).then(e=>{
+  document.getElementById('thread-title').innerText = e.title;
+  document.getElementById('thread-content').innerText = e.content;
 });

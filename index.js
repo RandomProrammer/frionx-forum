@@ -39,6 +39,10 @@ app.get('/threads', (req, res) => {
   res.render("threads");
 });
 
+app.get('/view-thread/:threadid', (req, res) =>{
+  res.render("view-thread", {id: req.params.threadid});
+});
+
 
 // API
 app.post("/api/v1/login", (req, res) => {

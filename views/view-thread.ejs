@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include("temp/head", { title: "Frionx Forum" }) %>
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include("temp/nav", { active: "threads" }); %>
+  <div class="forum-background">
+    <h1 class="display-heading">Welcome to Frionx Forums</h1>
+  </div>
+  <div class="forum-content-box forums">
+    <div class="forums-top">
+      <label class="font-large">Forums</label><button onclick="window.location.href = './create-thread';" class="btn create-forum right plus-btn"><i class="fas fa-plus"></i> Create Thread</button>
+    </div>
+    <div class="forum-container">
+        <label class="forum-form-header" id="thread-title"></label>
+        <textarea id="thread-content" class="forum-input-textarea" readonly></textarea>
+    </div>
+  </div>
+  <script>
+  let threadId = <%= id %>;
+  </script>
+  <!-- Important Site Scripts -->
+  <script src="../view-thread.js"></script>
+</body>
+</html>
