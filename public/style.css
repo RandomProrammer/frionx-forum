@@ -426,3 +426,9 @@ body, input, textarea, button {
 .miniforum {
   height: auto;
 }
+
+.reply-box{
+  min-height: 100px!important;
+  max-height: 400px!important;
+  height: 100px!important;
+}

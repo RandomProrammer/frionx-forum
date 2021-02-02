@@ -15,11 +15,13 @@
     "sqlite3": "^5.0.1"
   },
   "devDependencies": {
-    "ejs-lint": "^1.1.0"
+    "ejs-lint": "^1.1.0",
+    "eslint": "^7.19.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon . --watch public --watch views"
+    "start": "nodemon . --watch public --watch views",
+    "fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "",

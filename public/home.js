@@ -1,53 +1,51 @@
 $(() => {
   let showLogin = false;
   let showSignup = false;
-  $("#btn-login").click(function(){
-    if (showSignup){
+  $("#btn-login").click(() => {
+    if (showSignup) {
       document.getElementById("form-signup").style.display = "none";
       showSignup = false;
     }
-    if (showLogin != true){
+    if (showLogin != true) {
       document.getElementById("form-login").style.display = "block";
       showLogin = true;
-    }
-    else{
+    } else {
       document.getElementById("form-login").style.display = "none";
       showLogin = false;
     }
   });
 
-  $("#btn-signup").click(function(){
-    if (showLogin){
+  $("#btn-signup").click(() => {
+    if (showLogin) {
       document.getElementById("form-login").style.display = "none";
       showLogin = false;
     }
-    if (showSignup != true){
+    if (showSignup != true) {
       document.getElementById("form-signup").style.display = "block";
       showSignup = true;
-    }
-    else{
+    } else {
       document.getElementById("form-signup").style.display = "none";
       showSignup = false;
     }
   });
 
-  $("#btn-form-signup").click(function(){
-    let username = $("#txt-form-username").val();
-    let password = $("#txt-form-password").val();
-    let confirm_password = $("#txt-form-confirm-password").val();
-    fetch('/api/v1/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-          confirm_password: confirm_password
-        })
-    }).then(function(e){
+  $("#btn-form-signup").click(() => {
+    const username = $("#txt-form-username").val();
+    const password = $("#txt-form-password").val();
+    const confirm_password = $("#txt-form-confirm-password").val();
+    fetch("/api/v1/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        confirm_password: confirm_password
+      })
+    }).then((e) => {
       console.log(e);
-      switch (e.status){
+      switch (e.status) {
         case 400:
           $("#register-status").text("Incorrect form input sent.");
           break;
@@ -56,8 +54,8 @@ $(() => {
           break;
         case 200:
           $("#register-status").text("Successfully registered!");
-          localStorage.setItem('username', username);
-          localStorage.setItem('password', password);
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
           setTimeout(window.location.reload(), 1000);
           break;
         default:
@@ -66,28 +64,27 @@ $(() => {
     });
   });
 
-  $("#btn-form-login").click(function(){
-    let username = $("#txt-login-username").val();
-    let password = $("#txt-login-password").val();
+  $("#btn-form-login").click(() => {
+    const username = $("#txt-login-username").val();
+    const password = $("#txt-login-password").val();
     console.log(password);
-    fetch('/api/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        })
-    }).then(function(e){
-      e.json().then(data=>{
-        if (data.success){
+    fetch("/api/v1/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
+    }).then((e) => {
+      e.json().then(data => {
+        if (data.success) {
           $("#login-status").text("Successfully logged in!");
-          localStorage.setItem('username', username);
-          localStorage.setItem('password', password);
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
           setTimeout(window.location.reload(), 1000);
-        }
-        else{
+        } else {
           $("#login-status").text(data.error);
         }
       });
@@ -109,55 +106,53 @@ $(() => {
     });
   });
 
-  function displayLoggedIn(){
+  function displayLoggedIn() {
 
   }
 
-  if (localStorage.getItem('username') != null && localStorage.getItem('username') != "" && localStorage.getItem('password') != null && localStorage.getItem('password') != ""){
-    fetch('/api/v1/login', {
-      method: 'POST',
+  if (localStorage.getItem("username") != null && localStorage.getItem("username") != "" && localStorage.getItem("password") != null && localStorage.getItem("password") != "") {
+    fetch("/api/v1/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        username: localStorage.getItem('username'),
-        password: localStorage.getItem('password')
+        username: localStorage.getItem("username"),
+        password: localStorage.getItem("password")
       })
-    }).then(function(e){
-      if (e.status == 200){
-        $("#btn-login").css('display', 'none');
-        $("#btn-signup").css('display', 'none');
-        $("#btn-logout").css('display', 'block');
+    }).then((e) => {
+      if (e.status == 200) {
+        $("#btn-login").css("display", "none");
+        $("#btn-signup").css("display", "none");
+        $("#btn-logout").css("display", "block");
         displayLoggedIn();
       }
     });
   }
 
-  $("#btn-logout").click(function(){
-    localStorage.removeItem('username');
-    localStorage.removeItem('password');
+  $("#btn-logout").click(() => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("password");
     window.location.reload();
   });
 
   // Quick hide Drop down code
-  let dropDowns = document.getElementsByClassName("fas fa-caret-down");
-  for (let i = 0; i < dropDowns.length; i++){
-      dropDowns[i].parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0].style.display = "block";
-      let dropDown = dropDowns[i];
-      dropDown.onclick = function(){
-        if (dropDown.getAttribute("class") == "fas fa-caret-down"){
-          dropDown.setAttribute('class', 'fas fa-caret-right block-border');
-        }
-        else{
-          dropDown.setAttribute('class', 'fas fa-caret-down');
-        }
-        let element = dropDown.parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0];
-        if (element.style.display == "block"){
-          element.style.display = "none";
-        }
-        else if (element.style.display == "none"){
-          element.style.display = "block";
-        }
+  const dropDowns = document.getElementsByClassName("fas fa-caret-down");
+  for (let i = 0; i < dropDowns.length; i++) {
+    dropDowns[i].parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0].style.display = "block";
+    const dropDown = dropDowns[i];
+    dropDown.onclick = function() {
+      if (dropDown.getAttribute("class") == "fas fa-caret-down") {
+        dropDown.setAttribute("class", "fas fa-caret-right block-border");
+      } else {
+        dropDown.setAttribute("class", "fas fa-caret-down");
       }
+      const element = dropDown.parentElement.parentElement.getElementsByClassName("forum-block-bottom")[0];
+      if (element.style.display == "block") {
+        element.style.display = "none";
+      } else if (element.style.display == "none") {
+        element.style.display = "block";
+      }
+    };
   }
 });
