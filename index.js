@@ -193,7 +193,7 @@ app.get('/api/v1/get-all-threads', (req, res)=>{
   let db = new sqlite3.Database('./database/forums.db');
   let temp = {threads:[]};
   db.serialize(function(){
-    db.each(`SELECT * FROM posts`, function(err, row){
+    db.each(`SELECT * FROM posts ORDER by id DESC`, function(err, row){
       if (err) {
         throw err;
       }
