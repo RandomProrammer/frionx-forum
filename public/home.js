@@ -53,6 +53,12 @@ $("#btn-form-signup").click(function(){
       case 250:
         $("#register-status").text("Username already taken");
         break;
+      case 200:
+        $("#register-status").text("Successfully registered!");
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+        setTimeout(window.location.reload(), 1000);
+        break;
       default:
         break;
     }

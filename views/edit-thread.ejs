@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include("temp/head", { title: "Frionx Forum" }) %>
+  <link href="../style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include("temp/nav", { active: "threads" }); %>
+  <div class="forum-background">
+    <h1 class="display-heading">Welcome to Frionx Forums</h1>
+  </div>
+  <div class="forum-background">
+    <h1 class="display-heading">Welcome to Frionx Forums</h1>
+  </div>
+  <div class="forum-content-box forums">
+    <div class="forums-top">
+      <label class="font-large">Edit Thread</label><!--<button class="btn create-forum right plus-btn disabled" disabled><i class="fas fa-plus"></i> Create Thread</button>-->
+    </div>
+    <form id="create-thread-form">
+    <div class="forum-create-thread">
+      <label class="forum-form-header">Thread Title</label>
+      <input id="thread-title" class="forum-input-text" placeholder="Thread Title" required>
+      <label class="forum-form-header">Thread Content</label>
+      <textarea id="thread-content" class="forum-input-textarea" placeholder="I am writing about..."></textarea>
+      <hr class="forum-header-split">
+      <input type="submit" id="thread-submit" class="btn btn-submit" value="Submit">
+      <label class="forum-form-header" id="status"></label>
+    </div>
+    </form>
+  </div>
+  <script>
+  let threadId = <%= id %>;
+  </script>
+  <!-- Important Site Scripts -->
+  <script src="../edit-thread.js"></script>
+</body>
+</html>

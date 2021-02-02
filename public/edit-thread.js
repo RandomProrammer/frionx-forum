@@ -153,7 +153,7 @@ document.getElementById("create-thread-form").onsubmit = function(e){
       return;
     }
     else{
-      fetch('/api/v1/submit-thread', {
+      fetch('../api/v1/edit-thread', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -162,13 +162,14 @@ document.getElementById("create-thread-form").onsubmit = function(e){
           username: localStorage.getItem('username'),
           password: localStorage.getItem('password'),
           thread_title: threadtitle,
-          thread_content: threadcontent
+          thread_content: threadcontent,
+          thread_id: threadId
         })
       }).then(function(e){
         e.json().then(data=>{
           if (data.success){
             $("#status").text("Successfully created thread!");
-            window.location.href = "./threads";
+            window.location.href = `../view-thread/${threadId}`;
           }
           else{
             $("#status").text(data.error);

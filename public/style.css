@@ -408,3 +408,7 @@ body, input, textarea, button {
   color: white;
   text-decoration: none;
 }
+
+.miniforum{
+  height: auto!important;
+}

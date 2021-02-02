@@ -145,4 +145,10 @@ $("#btn-logout").click(function(){
 $.get(`../api/v1/get-thread-info/${threadId}`).then(e=>{
   document.getElementById('thread-title').innerText = e.title;
   document.getElementById('thread-content').innerText = e.content;
+  $.get(`../api/v1/get-username/${e.author}`).then(e=>{
+    $("#thread-author").text("Thread by: "+e.username);
+    if (e.username.toLowerCase() == localStorage.getItem("username").toLowerCase()){
+      document.getElementById("edit-thread").style.display = "block";
+    }
+  });
 });

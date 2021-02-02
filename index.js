@@ -43,6 +43,9 @@ app.get('/view-thread/:threadid', (req, res) =>{
   res.render("view-thread", {id: req.params.threadid});
 });
 
+app.get('/edit-thread/:threadid', (req, res)=>{
+  res.render("edit-thread", {id: req.params.threadid});
+});
 
 // API
 app.post("/api/v1/login", (req, res) => {
@@ -55,6 +58,23 @@ app.post("/api/v1/login", (req, res) => {
     else {
       res.status(400);
       res.send({ success: false, error: 'Incorrect login information' });
+    }
+  });
+  db.close();
+});
+
+
+app.get('/api/v1/get-username/:id', (req, res)=>{
+  let userid = req.params.id;
+  var db = new sqlite3.Database('./database/users.db');
+  db.all("SELECT id, username FROM users WHERE id=?", [userid], function(err, rows) {
+    if (rows.length >= 1) {
+      res.send(rows[0]);
+      res.status(200);
+    }
+    else {
+      res.status(400);
+      res.send({ success: false, error: 'No user with that ID.' });
     }
   });
   db.close();
@@ -121,6 +141,52 @@ app.post('/api/v1/submit-thread', (req, res) => {
     }
   });
   db.close();
+});
+
+app.post('/api/v1/edit-thread', (req, res) => {
+  let username = req.body.username;
+  let password = req.body.password;
+  let thread_title = req.body.thread_title;
+  let thread_content = req.body.thread_content;
+  let thread_id = req.body.thread_id;
+  let unixTimestamp = Math.round(new Date().getTime() / 1000);
+  var db = new sqlite3.Database('./database/users.db');
+  db.all("SELECT * FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
+    if (rows.length >= 1) {
+      // All Good with auth, continue
+      if (thread_title < 3 || thread_title > 80) {
+        res.status(400);
+        res.send({ success: false, error: "Bad Title!" });
+      }
+      else {
+        if (thread_content.length > 1000) {
+          res.status(400);
+          res.send({ success: false, error: "Thread Content is too large!" });
+        }
+        else{
+          // All Good!!!
+          // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
+          let db = new sqlite3.Database('./database/forums.db');
+          db.run('UPDATE posts (title, content, editDate) values(?, ?, ?) WHERE id=?', [thread_title, thread_content, unixTimestamp, thread_id], function(err) {
+            if (err) {
+              res.status(500);
+              res.send({success: false, error: "Could not successfully update data from database!"});
+              console.log(err);
+            }
+            else{
+              res.status(200);
+              res.send({success: true});
+            }
+          });
+          db.close();
+        }
+      }
+    }
+    else {
+      res.status(400);
+      res.send({ success: false, error: 'Incorrect login information; most likely not logged in..' });
+    }
+  });
 });
 
 app.get('/api/v1/get-all-threads', (req, res)=>{
