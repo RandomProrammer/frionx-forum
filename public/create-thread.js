@@ -147,7 +147,22 @@ document.getElementById("create-thread-form").onsubmit = function(e){
       return;
     }
     else{
-
+      fetch('/api/v1/submit-thread', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: localStorage.getItem('username'),
+          password: localStorage.getItem('password'),
+          thread_title: threadtitle,
+          thread_content: threadcontent
+        })
+      }).then(function(e){
+        e.json().then(data=>{
+          console.log(data);
+        });
+      });
     }
   }
 }

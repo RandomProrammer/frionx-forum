@@ -51,13 +51,31 @@ app.post("/api/v1/login", (req, res) => {
   db.close();
 });
 
+app.get('/api/v1/get-thread-info/:threadid', (req, res) => {
+  let threadid = req.params.threadid;
+var db = new sqlite3.Database('./database/forums.db');
+  db.all("SELECT * FROM posts WHERE id=?", [threadid], function(err, rows) {
+    if (rows.length >= 1) {
+      res.send(rows[0]);
+      res.status(200);
+    }
+    else {
+      res.status(400);
+      res.send({ success: false, error: 'No thread with that ID.' });
+    }
+  });
+  db.close();
+});
+
 app.post('/api/v1/submit-thread', (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
   let thread_title = req.body.thread_title;
   let thread_content = req.body.thread_content;
+  let unixTimestamp = Math.round(new Date().getTime() / 1000);
   var db = new sqlite3.Database('./database/users.db');
   db.all("SELECT * FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
+    let authorid = rows[0].id;
     if (rows.length >= 1) {
       // All Good with auth, continue
       if (thread_title < 3 || thread_title > 80) {
@@ -72,14 +90,19 @@ app.post('/api/v1/submit-thread', (req, res) => {
         else{
           // All Good!!!
           // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
-          if (dbManage.insertRow('./database/forums.db', 'INSERT INTO posts(title, content, author, creationDate), values(?, ?, ?, ?)')){
-            res.status(200);
-            res.send({success: true});
-          }
-          else{
-            res.status(500);
-            res.send({success: false, error: "Could not successfully insert data into database!"});
-          }
+          let db = new sqlite3.Database('./database/forums.db');
+          db.run('INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)', [thread_title, thread_content, authorid, unixTimestamp], function(err) {
+            if (err) {
+              res.status(500);
+              res.send({success: false, error: "Could not successfully insert data into database!"});
+              console.log(err);
+            }
+            else{
+              res.status(200);
+              res.send({success: true});
+            }
+          });
+          db.close();
         }
       }
     }
@@ -151,11 +174,12 @@ app.listen(config.port, () => {
 //DB Creation Code
 
 /*
-dbManage.createDatabase(__dirname+'/database/users.db', 'CREATE TABLE users (username TEXT, password TEXT, profile BLOB)');
+dbManage.createDatabase(__dirname+'/database/users.db', 'CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, profile BLOB)');
 
 
-dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)');
-dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)');
+dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)');
+
+dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE replies (id INTEGER PRIMARY KEY, content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)');
 
 
 /*
