@@ -84,8 +84,8 @@ app.post('/api/v1/submit-thread', (req, res) => {
   let unixTimestamp = Math.round(new Date().getTime() / 1000);
   var db = new sqlite3.Database('./database/users.db');
   db.all("SELECT * FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
-    let authorid = rows[0].id;
     if (rows.length >= 1) {
+      let authorid = rows[0].id;
       // All Good with auth, continue
       if (thread_title < 3 || thread_title > 80) {
         res.status(400);
@@ -117,7 +117,7 @@ app.post('/api/v1/submit-thread', (req, res) => {
     }
     else {
       res.status(400);
-      res.send({ success: false, error: 'Incorrect login information' });
+      res.send({ success: false, error: 'Incorrect login information; most likely not logged in..' });
     }
   });
   db.close();
