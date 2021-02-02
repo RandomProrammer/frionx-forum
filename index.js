@@ -50,7 +50,7 @@ app.get("/edit-thread/:threadid", (req, res) => {
 // API
 app.post("/api/v1/login", (req, res) => {
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
     if (rows.length >= 1) {
       bcrypt.compare(req.body.password, rows[0].password).then(result => {
         if (result) {
@@ -73,7 +73,7 @@ app.post("/api/v1/login", (req, res) => {
 app.get("/api/v1/get-username/:id", (req, res) => {
   const userid = req.params.id;
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT id, username FROM users WHERE id=?", [userid], (err, rows) => {
+  db.all("SELECT id, username FROM users WHERE id=?", [ userid ], (err, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -88,7 +88,7 @@ app.get("/api/v1/get-username/:id", (req, res) => {
 app.get("/api/v1/get-userinfo/:username", (req, res) => {
   const userid = req.params.username;
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT id, username FROM users WHERE username=?", [userid], (err, rows) => {
+  db.all("SELECT id, username FROM users WHERE username=?", [ userid ], (err, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -103,7 +103,7 @@ app.get("/api/v1/get-userinfo/:username", (req, res) => {
 app.get("/api/v1/get-thread-info/:threadid", (req, res) => {
   const threadid = req.params.threadid;
   const db = new sqlite3.Database("./database/forums.db");
-  db.all("SELECT * FROM posts WHERE id=?", [threadid], (err, rows) => {
+  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (err, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -119,10 +119,10 @@ app.post("/api/v1/submit-reply", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
   const thread_content = req.body.thread_content;
-  let thread_id = req.body.thread_id;
+  const thread_id = req.body.thread_id;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
     if (rows.length >= 1) {
       bcrypt.compare(req.body.password, rows[0].password).then(result => {
         if (result) {
@@ -134,7 +134,7 @@ app.post("/api/v1/submit-reply", (req, res) => {
             // All Good!!!
             // CREATE TABLE replies (id INTEGER PRIMARY KEY, content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)
             const db = new sqlite3.Database("./database/forums.db");
-            db.run("INSERT INTO replies(id, content, postId, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [thread_content, thread_id, authorid, unixTimestamp], (err) => {
+            db.run("INSERT INTO replies(id, content, postId, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ thread_content, thread_id, authorid, unixTimestamp ], (err) => {
               if (err) {
                 res.status(500);
                 res.send({ success: false, error: "Could not successfully insert data into database!" });
@@ -166,7 +166,7 @@ app.post("/api/v1/submit-thread", (req, res) => {
   const thread_content = req.body.thread_content;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
     if (rows.length >= 1) {
       bcrypt.compare(req.body.password, rows[0].password).then(result => {
         if (result) {
@@ -182,7 +182,7 @@ app.post("/api/v1/submit-thread", (req, res) => {
             // All Good!!!
             // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
             const db = new sqlite3.Database("./database/forums.db");
-            db.run("INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [thread_title, thread_content, authorid, unixTimestamp], (err) => {
+            db.run("INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ thread_title, thread_content, authorid, unixTimestamp ], (err) => {
               if (err) {
                 res.status(500);
                 res.send({ success: false, error: "Could not successfully insert data into database!" });
@@ -215,7 +215,7 @@ app.post("/api/v1/edit-thread", (req, res) => {
   const thread_id = req.body.thread_id;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
     if (rows.length >= 1) {
       bcrypt.compare(req.body.password, rows[0].password).then(result => {
         if (result) {
@@ -228,7 +228,7 @@ app.post("/api/v1/edit-thread", (req, res) => {
             res.send({ success: false, error: "Thread Content is too large!" });
           } else {
             const db = new sqlite3.Database("./database/forums.db");
-            db.all("SELECT id, author, title FROM posts WHERE id=?", [thread_id], (err, threadrows) => {
+            db.all("SELECT id, author, title FROM posts WHERE id=?", [ thread_id ], (err, threadrows) => {
               if (err) {
                 res.status(500);
                 res.send({ success: false, error: "Could not successfully update data from database!" });
@@ -236,7 +236,7 @@ app.post("/api/v1/edit-thread", (req, res) => {
               } else if (threadrows.length >= 1) {
                 if (threadrows[0].author == rows[0].id) {
                   const db = new sqlite3.Database("./database/forums.db");
-                  db.run("UPDATE posts SET title=?, content=?, editDate=? WHERE id=?", [thread_title, thread_content, unixTimestamp, thread_id], (err) => {
+                  db.run("UPDATE posts SET title=?, content=?, editDate=? WHERE id=?", [ thread_title, thread_content, unixTimestamp, thread_id ], (err) => {
                     if (err) {
                       res.status(500);
                       res.send({ success: false, error: "Could not successfully update data from database!" });
@@ -291,11 +291,11 @@ app.get("/api/v1/get-all-threads", (req, res) => {
 });
 
 app.get("/api/v1/get-all-replies/:id", (req, res) => {
-  let id = req.params.id;
-  let db = new sqlite3.Database("./database/forums.db");
-  let temp = { replies: [] };
+  const id = req.params.id;
+  const db = new sqlite3.Database("./database/forums.db");
+  const temp = { replies: [] };
   db.serialize(() => {
-    db.each("SELECT * FROM replies where postId=? ORDER by id DESC", [id.toString()], (err, row) => {
+    db.each("SELECT * FROM replies where postId=? ORDER by id DESC", [ id.toString() ], (err, row) => {
       if (err) {
         throw err;
       }
@@ -333,13 +333,13 @@ app.post("/api/v1/signup", (req, res) => {
         res.send({ success: false, error: "incorrect username format." });
       } else {
         const db = new sqlite3.Database("./database/users.db");
-        db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
+        db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
           if (rows.length >= 1) {
             res.status(250);
             res.send({ success: false, error: "username already taken." });
           } else {
             bcrypt.hash(req.body.password, config.saltRounds).then((hash) => {
-              if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [req.body.username, hash])) {
+              if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [ req.body.username, hash ])) {
                 res.status(200);
                 res.send({ success: true });
               } else {

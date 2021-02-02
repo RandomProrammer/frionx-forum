@@ -1,5 +1,10 @@
 let showLogin = false;
 let showSignup = false;
+
+if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
+  $(".forum-content-box").hide();
+}
+
 $("#btn-login").click(() => {
   if (showSignup) {
     document.getElementById("form-signup").style.display = "none";
@@ -45,20 +50,20 @@ $("#btn-form-signup").click(() => {
   }).then((e) => {
     console.log(e);
     switch (e.status) {
-      case 400:
-        $("#register-status").text("Incorrect form input sent.");
-        break;
-      case 250:
-        $("#register-status").text("Username already taken");
-        break;
-      case 200:
-        $("#register-status").text("Successfully registered!");
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-        setTimeout(window.location.reload(), 1000);
-        break;
-      default:
-        break;
+    case 400:
+      $("#register-status").text("Incorrect form input sent.");
+      break;
+    case 250:
+      $("#register-status").text("Username already taken");
+      break;
+    case 200:
+      $("#register-status").text("Successfully registered!");
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      setTimeout(window.location.reload(), 1000);
+      break;
+    default:
+      break;
     }
   });
 });

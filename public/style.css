@@ -88,11 +88,12 @@ body, input, textarea, button {
   border: 2px solid #30363d;
   padding: 6px;
   padding-top: 10px;
-  padding-bottom: 3;
   position: absolute;
   top: 50px;
   width: 300px;
   height: auto;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
 }
 
 .form-label {
@@ -144,7 +145,7 @@ body, input, textarea, button {
   display: none;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 900px) {
   .forum-title{
     display: none;
   }
@@ -188,7 +189,26 @@ body, input, textarea, button {
 
 @media only screen and (max-width: 500px){
   h1 {
-    font-size: 60px!important;
+    font-size: 50px!important;
+  }
+  .forum-background{
+    height: 200px;
+  }
+  .main-nav .navlink{
+    padding: 5px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+@media only screen and (max-width: 300px){
+  .main-nav .frm-btn {
+    margin: 2px;
+    height: 12px;
+    font-size: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-sizing: initial;
   }
 }
 
@@ -431,4 +451,12 @@ body, input, textarea, button {
   min-height: 100px!important;
   max-height: 400px!important;
   height: 100px!important;
+}
+
+#login-warning {
+  display: none;
+}
+
+.reply-forum{
+  width: 100%;
 }

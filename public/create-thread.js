@@ -1,5 +1,10 @@
 let showLogin = false;
 let showSignup = false;
+
+if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
+  $(".forum-content-box").hide();
+}
+
 $("#btn-login").click(() => {
   if (showSignup) {
     document.getElementById("form-signup").style.display = "none";
@@ -45,20 +50,20 @@ $("#btn-form-signup").click(() => {
   }).then((e) => {
     console.log(e);
     switch (e.status) {
-      case 400:
-        $("#register-status").text("Incorrect form input sent.");
-        break;
-      case 250:
-        $("#register-status").text("Username already taken");
-        break;
-      case 200:
-        $("#register-status").text("Successfully registered!");
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-        setTimeout(window.location.reload(), 1000);
-        break;
-      default:
-        break;
+    case 400:
+      $("#register-status").text("Incorrect form input sent.");
+      break;
+    case 250:
+      $("#register-status").text("Username already taken");
+      break;
+    case 200:
+      $("#register-status").text("Successfully registered!");
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      setTimeout(window.location.reload(), 1000);
+      break;
+    default:
+      break;
     }
   });
 });
@@ -138,13 +143,16 @@ $("#btn-logout").click(() => {
 document.getElementById("create-thread-form").onsubmit = function(e) {
   const threadtitle = $("#thread-title").val();
   const threadcontent = $("#thread-content").val();
+  document.getElementById("thread-submit").setAttribute("disabled", "");
   e.preventDefault();
   const tmptitle = threadtitle.replace(" ", "");
   if (tmptitle.length > 80 || tmptitle.length < 3) {
-    console.log("Thread title too short.");
+    $("#status").text("Thread title too short.");
+    document.getElementById("thread-submit").removeAttribute("disabled");
 
   } else if (threadcontent.length > 1000) {
-    console.log("Thread content too big");
+    $("#status").text("Thread content too big");
+    document.getElementById("thread-submit").removeAttribute("disabled");
 
   } else {
     fetch("/api/v1/submit-thread", {
@@ -163,9 +171,12 @@ document.getElementById("create-thread-form").onsubmit = function(e) {
         if (data.success) {
           $("#status").text("Successfully created thread!");
           window.location.href = "./threads";
+          document.getElementById("thread-submit").removeAttribute("disabled");
         } else {
           $("#status").text(data.error);
+          document.getElementById("thread-submit").removeAttribute("disabled");
         }
+        // document.getElementById("thread-submit").removeAttribute("disabled");
       });
     });
   }
