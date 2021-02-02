@@ -168,7 +168,7 @@ document.getElementById("create-thread-form").onsubmit = function(e){
       }).then(function(e){
         e.json().then(data=>{
           if (data.success){
-            $("#status").text("Successfully created thread!");
+            $("#status").text("Successfully edited thread!");
             window.location.href = `../view-thread/${threadId}`;
           }
           else{
@@ -179,3 +179,11 @@ document.getElementById("create-thread-form").onsubmit = function(e){
     }
   }
 }
+
+
+$.get(`../api/v1/get-thread-info/${threadId}`).then(e=>{
+  let threadtitle = $("#thread-title");
+  let threadcontent = $("#thread-content");
+  threadtitle.val(e.title);
+  threadcontent.val(e.content);
+});

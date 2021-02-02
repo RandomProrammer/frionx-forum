@@ -151,7 +151,7 @@ app.post('/api/v1/edit-thread', (req, res) => {
   let thread_id = req.body.thread_id;
   let unixTimestamp = Math.round(new Date().getTime() / 1000);
   var db = new sqlite3.Database('./database/users.db');
-  db.all("SELECT * FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
+  db.all("SELECT id, username FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
     if (rows.length >= 1) {
       // All Good with auth, continue
       if (thread_title < 3 || thread_title > 80) {
@@ -164,21 +164,44 @@ app.post('/api/v1/edit-thread', (req, res) => {
           res.send({ success: false, error: "Thread Content is too large!" });
         }
         else{
-          // All Good!!!
-          // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
           let db = new sqlite3.Database('./database/forums.db');
-          db.run('UPDATE posts (title, content, editDate) values(?, ?, ?) WHERE id=?', [thread_title, thread_content, unixTimestamp, thread_id], function(err) {
+          db.all('SELECT id, author, title FROM posts WHERE id=?', [thread_id], function(err, threadrows) {
             if (err) {
               res.status(500);
               res.send({success: false, error: "Could not successfully update data from database!"});
               console.log(err);
             }
             else{
-              res.status(200);
-              res.send({success: true});
+              if (threadrows.length >= 1){
+                if (threadrows[0].author == rows[0].id){
+                  let db = new sqlite3.Database('./database/forums.db');
+                  db.run('UPDATE posts SET title=?, content=?, editDate=? WHERE id=?', [thread_title, thread_content, unixTimestamp, thread_id], function(err) {
+                    if (err) {
+                      res.status(500);
+                      res.send({success: false, error: "Could not successfully update data from database!"});
+                      console.log(err);
+                    }
+                    else{
+                      res.status(200);
+                      res.send({success: true});
+                    }
+                  });
+                  db.close();
+                }
+                else{
+                  res.status(403);
+                  res.send({success: false, error: 'Not allowed to edit this thread!'});
+                }
+              }
+              else{
+                res.status(500);
+                res.send({success: false, error: 'Thread not found.'});
+              }
             }
           });
           db.close();
+          // All Good!!!
+          // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
         }
       }
     }

@@ -144,7 +144,8 @@ $("#btn-logout").click(function(){
         */
 $.get(`../api/v1/get-thread-info/${threadId}`).then(e=>{
   document.getElementById('thread-title').innerText = e.title;
-  document.getElementById('thread-content').innerText = e.content;
+  // At this moment you might call me crazy for not making it just text, but textareas dont recognize dom elements breaking any type of XSS!
+  document.getElementById('thread-content').innerHTML = e.content;
   $.get(`../api/v1/get-username/${e.author}`).then(e=>{
     $("#thread-author").text("Thread by: "+e.username);
     if (e.username.toLowerCase() == localStorage.getItem("username").toLowerCase()){
