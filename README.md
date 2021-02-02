@@ -10,10 +10,10 @@ Login/Sign up not dependent on the repl.it service<br>
 Thread Creation<br>
 Thread List<br>
 View specific Threads<br>
-
-# Upcoming Features
 Editing<br>
 Creation Date and Edit Date<br>
+
+# Upcoming Features
 Replies/Comments<br>
 Admins<br>
 Moderation<br>
