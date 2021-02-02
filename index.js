@@ -4,7 +4,7 @@ const path = require("path");
 // const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3');
 // const rl = require('readline-sync');
-
+const bcrypt = require('bcrypt');
 const config = require('./config.json');
 const dbManage = require('./database');
 
@@ -40,20 +40,28 @@ app.get('/threads', (req, res) => {
 });
 
 app.get('/view-thread/:threadid', (req, res) =>{
-  res.render("view-thread", {id: req.params.threadid});
+  res.render("view-thread", { id: req.params.threadid });
 });
 
 app.get('/edit-thread/:threadid', (req, res)=>{
-  res.render("edit-thread", {id: req.params.threadid});
+  res.render("edit-thread", { id: req.params.threadid });
 });
 
 // API
 app.post("/api/v1/login", (req, res) => {
   let db = new sqlite3.Database('./database/users.db');
-  db.all("SELECT * FROM users WHERE username=? AND password=?", [req.body.username, req.body.password], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
     if (rows.length >= 1) {
-      res.status(200);
-      res.send({ success: true });
+      bcrypt.compare(req.body.password, rows[0].password).then(result=>{
+        if (result){
+          res.status(200);
+          res.send({ success: true });
+        }
+        else{
+          res.status(400);
+          res.send({success: false, error: 'Incorrect login information!'});
+        }
+      });
     }
     else {
       res.status(400);
@@ -75,6 +83,22 @@ app.get('/api/v1/get-username/:id', (req, res)=>{
     else {
       res.status(400);
       res.send({ success: false, error: 'No user with that ID.' });
+    }
+  });
+  db.close();
+});
+
+app.get('/api/v1/get-userinfo/:username', (req, res)=>{
+  let userid = req.params.username;
+  var db = new sqlite3.Database('./database/users.db');
+  db.all("SELECT id, username FROM users WHERE username=?", [userid], function(err, rows) {
+    if (rows.length >= 1) {
+      res.send(rows[0]);
+      res.status(200);
+    }
+    else {
+      res.status(400);
+      res.send({ success: false, error: 'No user with that username.' });
     }
   });
   db.close();
@@ -102,42 +126,50 @@ app.post('/api/v1/submit-thread', (req, res) => {
   let thread_title = req.body.thread_title;
   let thread_content = req.body.thread_content;
   let unixTimestamp = Math.round(new Date().getTime() / 1000);
-  var db = new sqlite3.Database('./database/users.db');
-  db.all("SELECT * FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
+  let db = new sqlite3.Database('./database/users.db');
+  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
     if (rows.length >= 1) {
-      let authorid = rows[0].id;
-      // All Good with auth, continue
-      if (thread_title < 3 || thread_title > 80) {
-        res.status(400);
-        res.send({ success: false, error: "Bad Title!" });
-      }
-      else {
-        if (thread_content.length > 1000) {
-          res.status(400);
-          res.send({ success: false, error: "Thread Content is too large!" });
-        }
-        else{
-          // All Good!!!
-          // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
-          let db = new sqlite3.Database('./database/forums.db');
-          db.run('INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)', [thread_title, thread_content, authorid, unixTimestamp], function(err) {
-            if (err) {
-              res.status(500);
-              res.send({success: false, error: "Could not successfully insert data into database!"});
-              console.log(err);
+      bcrypt.compare(req.body.password, rows[0].password).then(result=>{
+        if (result){
+          let authorid = rows[0].id;
+          // All Good with auth, continue
+          if (thread_title < 3 || thread_title > 80) {
+            res.status(400);
+            res.send({ success: false, error: "Bad Title!" });
+          }
+          else {
+            if (thread_content.length > 1000) {
+              res.status(400);
+              res.send({ success: false, error: "Thread Content is too large!" });
             }
             else{
-              res.status(200);
-              res.send({success: true});
+              // All Good!!!
+              // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
+              let db = new sqlite3.Database('./database/forums.db');
+              db.run('INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)', [thread_title, thread_content, authorid, unixTimestamp], function(err) {
+                if (err) {
+                  res.status(500);
+                  res.send({success: false, error: "Could not successfully insert data into database!"});
+                  console.log(err);
+                }
+                else{
+                  res.status(200);
+                  res.send({success: true});
+                }
+              });
+              db.close();
             }
-          });
-          db.close();
+          }
         }
-      }
+        else{
+          res.status(400);
+          res.send({success: false, error: 'Incorrect login information!'});
+        }
+      });
     }
     else {
       res.status(400);
-      res.send({ success: false, error: 'Incorrect login information; most likely not logged in..' });
+      res.send({ success: false, error: 'Incorrect login information' });
     }
   });
   db.close();
@@ -150,66 +182,75 @@ app.post('/api/v1/edit-thread', (req, res) => {
   let thread_content = req.body.thread_content;
   let thread_id = req.body.thread_id;
   let unixTimestamp = Math.round(new Date().getTime() / 1000);
-  var db = new sqlite3.Database('./database/users.db');
-  db.all("SELECT id, username FROM users WHERE username=? AND password=?", [username, password], function(err, rows) {
+  let db = new sqlite3.Database('./database/users.db');
+  db.all("SELECT * FROM users WHERE username=?", [req.body.username], (err, rows) => {
     if (rows.length >= 1) {
-      // All Good with auth, continue
-      if (thread_title < 3 || thread_title > 80) {
-        res.status(400);
-        res.send({ success: false, error: "Bad Title!" });
-      }
-      else {
-        if (thread_content.length > 1000) {
-          res.status(400);
-          res.send({ success: false, error: "Thread Content is too large!" });
-        }
-        else{
-          let db = new sqlite3.Database('./database/forums.db');
-          db.all('SELECT id, author, title FROM posts WHERE id=?', [thread_id], function(err, threadrows) {
-            if (err) {
-              res.status(500);
-              res.send({success: false, error: "Could not successfully update data from database!"});
-              console.log(err);
+      bcrypt.compare(req.body.password, rows[0].password).then(result=>{
+        if (result){
+          // All Good with auth, continue
+          if (thread_title < 3 || thread_title > 80) {
+            res.status(400);
+            res.send({ success: false, error: "Bad Title!" });
+          }
+          else {
+            if (thread_content.length > 1000) {
+              res.status(400);
+              res.send({ success: false, error: "Thread Content is too large!" });
             }
             else{
-              if (threadrows.length >= 1){
-                if (threadrows[0].author == rows[0].id){
-                  let db = new sqlite3.Database('./database/forums.db');
-                  db.run('UPDATE posts SET title=?, content=?, editDate=? WHERE id=?', [thread_title, thread_content, unixTimestamp, thread_id], function(err) {
-                    if (err) {
-                      res.status(500);
-                      res.send({success: false, error: "Could not successfully update data from database!"});
-                      console.log(err);
-                    }
-                    else{
-                      res.status(200);
-                      res.send({success: true});
-                    }
-                  });
-                  db.close();
+              let db = new sqlite3.Database('./database/forums.db');
+              db.all('SELECT id, author, title FROM posts WHERE id=?', [thread_id], function(err, threadrows) {
+                if (err) {
+                  res.status(500);
+                  res.send({success: false, error: "Could not successfully update data from database!"});
+                  console.log(err);
                 }
                 else{
-                  res.status(403);
-                  res.send({success: false, error: 'Not allowed to edit this thread!'});
+                  if (threadrows.length >= 1){
+                    if (threadrows[0].author == rows[0].id){
+                      let db = new sqlite3.Database('./database/forums.db');
+                      db.run('UPDATE posts SET title=?, content=?, editDate=? WHERE id=?', [thread_title, thread_content, unixTimestamp, thread_id], function(err) {
+                        if (err) {
+                          res.status(500);
+                          res.send({success: false, error: "Could not successfully update data from database!"});
+                          console.log(err);
+                        }
+                        else{
+                          res.status(200);
+                          res.send({success: true});
+                        }
+                      });
+                      db.close();
+                    }
+                    else{
+                      res.status(403);
+                      res.send({success: false, error: 'Not allowed to edit this thread!'});
+                    }
+                  }
+                  else{
+                    res.status(500);
+                    res.send({success: false, error: 'Thread not found.'});
+                  }
                 }
-              }
-              else{
-                res.status(500);
-                res.send({success: false, error: 'Thread not found.'});
-              }
+              });
+              db.close();
+              // All Good!!!
+              // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
             }
-          });
-          db.close();
-          // All Good!!!
-          // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
+          }
         }
-      }
+        else{
+          res.status(400);
+          res.send({success: false, error: 'Incorrect login information!'});
+        }
+      });
     }
     else {
       res.status(400);
-      res.send({ success: false, error: 'Incorrect login information; most likely not logged in..' });
+      res.send({ success: false, error: 'Incorrect login information' });
     }
   });
+  db.close();
 });
 
 app.get('/api/v1/get-all-threads', (req, res)=>{
@@ -265,14 +306,16 @@ app.post("/api/v1/signup", (req, res) => {
               res.send({ success: false, error: 'username already taken.' });
             }
             else {
-              if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [req.body.username, req.body.password])) {
-                res.status(200);
-                res.send({ success: true });
-              }
-              else {
-                res.status(500);
-                res.send({ success: false, error: "Couldn't register account successfully" });
-              }
+              bcrypt.hash(req.body.password, config.saltRounds).then(function(hash){
+                if (dbManage.insertRow("./database/users.db", "INSERT INTO users(username, password) VALUES(?, ?)", [req.body.username, hash])) {
+                  res.status(200);
+                  res.send({ success: true });
+                }
+                else {
+                  res.status(500);
+                  res.send({ success: false, error: "Couldn't register account successfully" });
+                }
+              });
             }
           });
           db.close();

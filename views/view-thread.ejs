@@ -11,11 +11,15 @@
   </div>
   <div class="forum-content-box miniforum">
     <div class="forums-top">
-      <label class="font-large">Thread</label><button id="edit-thread" onclick="window.location.href = '../edit-thread/<%= id %>';" class="btn create-forum right plus-btn" style="display: none;"><i class="far fa-edit"></i> Edit Thread</button>
+      <label class="font-large">Thread</label>
+      <button id="edit-thread" onclick="window.location.href = '/edit-thread/<%= id %>';" class="btn create-forum right plus-btn" style="display: none;"><i class="far fa-edit"></i> Edit Thread</button>
     </div>
     <div class="forum-container">
         <label class="forum-form-header" id="thread-title"></label>
-        <label class="forum-form-header" id="thread-author"></label>
+        <label class="forum-form-subheader" id="thread-author"></label>
+        <label class="forum-form-small" id="thread-date"></label>
+        <label class="forum-form-small" id="edit-date"></label>
+
         <textarea id="thread-content" class="forum-input-textarea" readonly></textarea>
     </div>
   </div>

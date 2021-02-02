@@ -186,4 +186,9 @@ $.get(`../api/v1/get-thread-info/${threadId}`).then(e=>{
   let threadcontent = $("#thread-content");
   threadtitle.val(e.title);
   threadcontent.val(e.content);
+  $.get(`/api/v1/get-userinfo/${localStorage.getItem("username")}`).then(data=>{
+    if (data.id.toString() != e.author.toString()){
+      window.location.href = "../view-thread/"+threadId;
+    }
+  });
 });

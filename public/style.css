@@ -106,15 +106,16 @@ body, input, textarea, button {
   float: left;
   font-size: 16px;
   outline: none;
-  width: 98%;
-  border-radius: 3px;
-  border: none;
-  color: black;
-  margin-bottom: 3px;
+  width: calc(100% - 8px);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  margin-bottom: 8px;
+  padding: 4px;
 }
 
 .form-input:focus {
-  border: 2px solid black;
+  border: 1px solid #038cfc;
 }
 
 .form-button {
@@ -174,19 +175,19 @@ body, input, textarea, button {
 }
 
 @media only screen and (max-width: 1200px) {
-  .forum-background{
+  .forum-background {
     width: calc(100% - 12px);
   }
 }
 
 @media only screen and (max-width: 1200px){
-  .forum-content-box{
+  .forum-content-box {
     width: calc(100% - 12px)!important;
   }
 }
 
 @media only screen and (max-width: 500px){
-  h1{
+  h1 {
     font-size: 60px!important;
   }
 }
@@ -200,11 +201,12 @@ body, input, textarea, button {
   font-size: 80px;
 }
 
-.forum-content-box{
+.forum-content-box {
   background-color: #0d1117;
   border: 2px solid#30363d;
   border-radius: 4px;
   margin-top: 8px;
+  margin-bottom: 8px;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
@@ -236,12 +238,12 @@ body, input, textarea, button {
   border: 1.5px solid #8b949e;
 }
 
-.right{
-  float: right!important;
+.right {
+  float: right;
 }
 
-.plus-btn{
-  padding: 15px 15px!important;
+.plus-btn {
+  padding: 15px 15px;
 }
 
 .forum-block{
@@ -344,6 +346,22 @@ body, input, textarea, button {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.forum-form-subheader {
+  display: block;
+  font-size: 0.86rem;
+  margin: 8px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.forum-form-small {
+  display: block;
+  font-size: 0.7rem;
+  margin: 8px 0;
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.5); 
+}
+
 .forum-input-text {
   width: calc(100% - 12px);
   padding: 6px;
@@ -400,15 +418,11 @@ body, input, textarea, button {
   box-shadow: 0 0 0 4px rgba(0, 140, 255, 0.5);
 }
 
-.form-input{
-  color: white!important;
-}
-
-.forum-block-header-link{
+.forum-block-header-link {
   color: white;
   text-decoration: none;
 }
 
-.miniforum{
-  height: auto!important;
+.miniforum {
+  height: auto;
 }
