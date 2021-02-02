@@ -35,6 +35,11 @@ app.get('/create-thread', (req, res) => {
 });
 
 
+app.get('/threads', (req, res) => {
+  res.render("threads");
+});
+
+
 // API
 app.post("/api/v1/login", (req, res) => {
   let db = new sqlite3.Database('./database/users.db');
@@ -112,6 +117,23 @@ app.post('/api/v1/submit-thread', (req, res) => {
     }
   });
   db.close();
+});
+
+app.get('/api/v1/get-all-threads', (req, res)=>{
+  let db = new sqlite3.Database('./database/forums.db');
+  let temp = {threads:[]};
+  db.serialize(function(){
+    db.each(`SELECT * FROM posts`, function(err, row){
+      if (err) {
+        throw err;
+      }
+      temp.threads.push({id: row.id, title: row.title});
+    },function(){
+      res.send(temp);
+      db.close();
+    }
+    );
+  });
 });
 
 app.post("/api/v1/signup", (req, res) => {

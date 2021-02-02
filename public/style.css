@@ -403,3 +403,8 @@ body, input, textarea, button {
 .form-input{
   color: white!important;
 }
+
+.forum-block-header-link{
+  color: white;
+  text-decoration: none;
+}

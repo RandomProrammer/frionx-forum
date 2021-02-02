@@ -53,6 +53,12 @@ $("#btn-form-signup").click(function(){
       case 250:
         $("#register-status").text("Username already taken");
         break;
+      case 200:
+        $("#register-status").text("Successfully registered!");
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+        setTimeout(window.location.reload(), 1000);
+        break;
       default:
         break;
     }
@@ -131,44 +137,28 @@ $("#btn-logout").click(function(){
   localStorage.removeItem('password');
   window.location.reload();
 });
-
-document.getElementById("create-thread-form").onsubmit = function(e){
-  let threadtitle = $("#thread-title").val();
-  let threadcontent = $("#thread-content").val();
-  e.preventDefault();
-  let tmptitle = threadtitle.replace(" ", "");
-  if (tmptitle.length > 80 || tmptitle.length < 3){
-    console.log("Thread title too short.");
-    return;
-  }
-  else{
-    if (threadcontent.length > 1000){
-      console.log("Thread content too big");
-      return;
-    }
-    else{
-      fetch('/api/v1/submit-thread', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: localStorage.getItem('username'),
-          password: localStorage.getItem('password'),
-          thread_title: threadtitle,
-          thread_content: threadcontent
-        })
-      }).then(function(e){
-        e.json().then(data=>{
-          if (data.success){
-            $("#status").text("Successfully created thread!");
-            window.location.href = "./threads";
-          }
-          else{
-            $("#status").text(data.error);
-          }
-        });
-      });
-    }
-  }
+/*
+   <div class="forum-block-container">
+        <div class="forum-block"> Programming Subforums</div>
+        <div class="forum-block-bottom">
+          cry
+        </div>
+      </div>
+*/
+function addForum(forumId, forumName){
+  let forumBlock = document.createElement('div');
+  forumBlock.setAttribute('class', 'forum-block');
+  let innerText = document.createElement('a');
+  innerText.setAttribute('class', 'forum-block-header-link');
+  innerText.setAttribute('href', '/view-form/'+forumId);
+  innerText.innerText = forumName;
+  forumBlock.append(innerText)
+  document.getElementById("forum-container").append(forumBlock);
 }
+
+$.get("./api/v1/get-all-threads").then(e=>{
+  e.threads.forEach(function(obj){
+    console.log(obj);
+    addForum(obj.id, obj.title);
+  });
+});
