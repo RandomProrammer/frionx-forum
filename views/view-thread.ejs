@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <%- include("temp/head", { title: "Frionx Forum" }) %>
+  <meta id="embed-title" property="og:title" content="<%= title %>">
+  <meta id="embed-desc" property="og:description" content="<%= description %>">
 </head>
 <body>
   <%- include("temp/nav", { active: "" }); %>

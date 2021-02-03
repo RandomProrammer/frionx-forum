@@ -3,6 +3,7 @@ let showSignup = false;
 
 if (!localStorage.getItem("username") || !localStorage.getItem("password")) {
   $("#commentbox").hide();
+  $("#login-warning").show();
 }
 
 $("#btn-login").click(() => {
@@ -33,40 +34,29 @@ $("#btn-signup").click(() => {
   }
 });
 
-$("#btn-form-signup").click(() => {
-  const username = $("#txt-form-username").val();
-  const password = $("#txt-form-password").val();
-  const confirm_password = $("#txt-form-confirm-password").val();
-  fetch("/api/v1/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      username: username,
-      password: password,
-      confirm_password: confirm_password
-    })
-  }).then((e) => {
-    console.log(e);
-    switch (e.status) {
-    case 400:
-      $("#register-status").text("Incorrect form input sent.");
-      break;
-    case 250:
-      $("#register-status").text("Username already taken");
-      break;
-    case 200:
-      $("#register-status").text("Successfully registered!");
-      localStorage.setItem("username", username);
-      localStorage.setItem("password", password);
-      setTimeout(window.location.reload(), 1000);
-      break;
-    default:
-      break;
-    }
+  $("#btn-form-signup").click(() => {
+    const username = $("#txt-form-username").val();
+    const password = $("#txt-form-password").val();
+    const confirm_password = $("#txt-form-confirm-password").val();
+    fetch("/api/v1/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+        confirm_password: confirm_password
+      })
+    }).then((e) => {
+      if (e.success){
+        $("#register-status").text("Successful Signup!");
+      }
+      else {
+        $("#register-status").text(e.error);
+      }
+    });
   });
-});
 
 $("#btn-form-login").click(() => {
   const username = $("#txt-login-username").val();
@@ -150,12 +140,18 @@ $.get(`/api/v1/get-thread-info/${threadId}`).then(e => {
   // brain
   document.getElementById("thread-content").innerHTML = e.content;
 
+  const createD = new Date(Number(e.creationDate) * 1000);
+
   $("#thread-date").text(
     `Created: ${
-      new Date(Number(e.creationDate) * 1000).toLocaleDateString()}`
+    `${createD.toLocaleDateString()} ${createD.getHours()}:${createD.getMinutes()}`}`
   );
 
-  if (e.editDate) $("#edit-date").text(`Edited: ${new Date(Number(e.editDate) * 1000).toLocaleDateString()}`);
+  if (e.editDate) {
+    const editD = new Date(Number(e.editDate) * 1000);
+    $("#edit-date").text(`Edited: ${new Date(Number(editD)).toLocaleDateString()} ${editD.getHours()}:${editD.getMinutes()}`);
+  }
+
   $.get(`/api/v1/get-username/${e.author}`).then(e => {
     $("#thread-author").text(`Thread by: ${e.username}`);
     if (e.username.toLowerCase() == localStorage.getItem("username").toLowerCase()) {
@@ -165,28 +161,32 @@ $.get(`/api/v1/get-thread-info/${threadId}`).then(e => {
 
   });
 });
-
 $.get(`/api/v1/get-all-replies/${threadId}`, {
-  cache: 'false'
-}).then(e=>{
-  if (e.replies.length <= 0){
-    document.getElementById("replies").innerHTML += "Darn it! No replies yet!";
+  cache: "false"
+}).then(e => {
+  if (e.replies.length <= 0) {
+    document.getElementById("replies").innerHTML += "No replies yet. Why not start the conversation?";
   }
-  e.replies.forEach(function(reply){
-      $.get(`/api/v1/get-username/${reply.author}`).then(e => {
-        let divForum = document.createElement('div');
-        divForum.setAttribute('class', 'forum-content-box miniforum reply-forum');
-        let name = document.createElement('label');
-        name.setAttribute('class', 'forum-form-header');
-        name.innerText = e.username;
-        let textarea = document.createElement('textarea');
-        textarea.setAttribute('class', 'forum-input-textarea reply-box');
-        textarea.setAttribute('readonly', '');
-        textarea.innerHTML = reply.content;
-        divForum.append(name);
-        divForum.append(textarea);
-        document.getElementById("replies").append(divForum);
-      });
+  e.replies.forEach((reply) => {
+    $.get(`/api/v1/get-username/${reply.author}`).then(e => {
+      const divForum = document.createElement("div");
+      divForum.setAttribute("class", "forum-content-box miniforum reply-forum");
+      const name = document.createElement("label");
+      name.setAttribute("class", "forum-form-header");
+      name.innerText = e.username;
+      const textarea = document.createElement("textarea");
+      let creationDate = document.createElement('label');
+      creationDate.setAttribute('class', 'forum-form-small');
+      const createD = new Date(Number(reply.creationDate) * 1000);
+      creationDate.innerText = new Date(Number(createD)).toLocaleDateString() +" " + createD.getHours()+':'+createD.getMinutes();
+      textarea.setAttribute("class", "forum-input-textarea reply-box");
+      textarea.setAttribute("readonly", "");
+      textarea.innerHTML = reply.content;
+      divForum.append(name);
+      divForum.append(creationDate);
+      divForum.append(textarea);
+      document.getElementById("replies").append(divForum);
+    });
   });
 });
 

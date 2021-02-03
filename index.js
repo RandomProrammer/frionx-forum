@@ -40,7 +40,18 @@ app.get("/threads", (req, res) => {
 });
 
 app.get("/view-thread/:threadid", (req, res) => {
-  res.render("view-thread", { id: req.params.threadid });
+  const threadid = req.params.threadid;
+  const db = new sqlite3.Database("./database/forums.db");
+  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (err, rows) => {
+    if (rows.length >= 1) {
+        res.render("view-thread", { id: req.params.threadid, title: rows[0].title, description: 'Checkout '+rows[0].title+' on frionx forums!' });
+      res.status(200);
+    } else {
+      res.status(400);
+      res.send({ success: false, error: "No thread with that ID." });
+    }
+  });
+  db.close();
 });
 
 app.get("/edit-thread/:threadid", (req, res) => {

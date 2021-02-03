@@ -4,7 +4,7 @@ const databaseManager = {};
 databaseManager.createDatabase = function(database, sql) {
   const db = new sqlite3.Database(database);
 
-  db.serialize(()=> {
+  db.serialize(() => {
     db.run(sql);
   });
 

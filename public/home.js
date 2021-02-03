@@ -44,22 +44,11 @@ $(() => {
         confirm_password: confirm_password
       })
     }).then((e) => {
-      console.log(e);
-      switch (e.status) {
-      case 400:
-        $("#register-status").text("Incorrect form input sent.");
-        break;
-      case 250:
-        $("#register-status").text("Username already taken");
-        break;
-      case 200:
-        $("#register-status").text("Successfully registered!");
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-        setTimeout(window.location.reload(), 1000);
-        break;
-      default:
-        break;
+      if (e.success){
+        $("#register-status").text("Successful Signup!");
+      }
+      else {
+        $("#register-status").text(e.error);
       }
     });
   });
