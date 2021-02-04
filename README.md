@@ -1,5 +1,5 @@
 # 24/7 URL
-https://forums.frionx.xyz
+https://forum.frionx.xyz
 
 # Frionx Forum
 Frionx Forum is a forum like website (such as Xenforo) programmed in Node.js while being Open Soruce
