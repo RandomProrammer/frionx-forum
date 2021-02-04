@@ -135,10 +135,10 @@ document.getElementById("create-thread-form").onsubmit = function(e) {
   e.preventDefault();
   const tmptitle = threadtitle.replace(" ", "");
   if (tmptitle.length > 80 || tmptitle.length < 3) {
-    console.log("Thread title too short.");
+    $("#status").text("Thread title too short.");
 
   } else if (threadcontent.length > 1000) {
-    console.log("Thread content too big");
+    $("#status").text("Thread content too big");
 
   } else {
     fetch("../api/v1/edit-thread", {

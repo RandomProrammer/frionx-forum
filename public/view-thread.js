@@ -161,6 +161,13 @@ $.get(`/api/v1/get-thread-info/${threadId}`).then(e => {
 
   });
 });
+
+function setName(element, id){
+  $.get(`/api/v1/get-username/${id}`).then(e=>{
+    element.innerText = e.username;
+  });
+}
+
 $.get(`/api/v1/get-all-replies/${threadId}`, {
   cache: "false"
 }).then(e => {
@@ -168,12 +175,12 @@ $.get(`/api/v1/get-all-replies/${threadId}`, {
     document.getElementById("replies").innerHTML += "No replies yet. Why not start the conversation?";
   }
   e.replies.forEach((reply) => {
-    $.get(`/api/v1/get-username/${reply.author}`).then(e => {
       const divForum = document.createElement("div");
       divForum.setAttribute("class", "forum-content-box miniforum reply-forum");
       const name = document.createElement("label");
       name.setAttribute("class", "forum-form-header");
-      name.innerText = e.username;
+      name.innerText = reply.author;
+      setName(name, reply.author);
       const textarea = document.createElement("textarea");
       let creationDate = document.createElement('label');
       creationDate.setAttribute('class', 'forum-form-small');
@@ -186,7 +193,6 @@ $.get(`/api/v1/get-all-replies/${threadId}`, {
       divForum.append(creationDate);
       divForum.append(textarea);
       document.getElementById("replies").append(divForum);
-    });
   });
 });
 
