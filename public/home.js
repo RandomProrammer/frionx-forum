@@ -44,10 +44,9 @@ $(() => {
         confirm_password: confirm_password
       })
     }).then((e) => {
-      if (e.success){
+      if (e.success) {
         $("#register-status").text("Successful Signup!");
-      }
-      else {
+      } else {
         $("#register-status").text(e.error);
       }
     });

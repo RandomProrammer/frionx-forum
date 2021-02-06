@@ -1,13 +1,19 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-// const bodyParser = require('body-parser');
 const sqlite3 = require("sqlite3");
-// const rl = require('readline-sync');
 const bcrypt = require("bcrypt");
 const config = require("./config.json");
 const dbManage = require("./database");
+const forumDB = require("knex")({
+  client: "sqlite3",
+  connection: {
+    filename: "./database/forums.db"
+  }
+});
 
+const showdown = require("showdown");
+const converter = new showdown.Converter();
 
 // template
 app.set("view engine", "ejs");
@@ -30,21 +36,22 @@ app.get("/", (_, res) => {
   res.render("index");
 });
 
-app.get("/create-thread", (req, res) => {
+app.get("/create-thread", (_, res) => {
   res.render("create-thread");
 });
 
 
-app.get("/threads", (req, res) => {
+app.get("/threads", (_
+  , res) => {
   res.render("threads");
 });
 
 app.get("/view-thread/:threadid", (req, res) => {
   const threadid = req.params.threadid;
   const db = new sqlite3.Database("./database/forums.db");
-  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (err, rows) => {
+  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (_, rows) => {
     if (rows.length >= 1) {
-        res.render("view-thread", { id: req.params.threadid, title: rows[0].title, description: 'Checkout '+rows[0].title+' on frionx forums!' });
+      res.render("view-thread", { id: req.params.threadid, title: rows[0].title, description: `Checkout ${rows[0].title} on frionx forums!` });
       res.status(200);
     } else {
       res.status(400);
@@ -58,10 +65,14 @@ app.get("/edit-thread/:threadid", (req, res) => {
   res.render("edit-thread", { id: req.params.threadid });
 });
 
+app.get("/settings", (req, res) => {
+  res.render("settings");
+});
+
 // API
 app.post("/api/v1/login", (req, res) => {
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (_, rows) => {
     if (rows.length >= 1) {
       bcrypt.compare(req.body.password, rows[0].password).then(result => {
         if (result) {
@@ -84,7 +95,7 @@ app.post("/api/v1/login", (req, res) => {
 app.get("/api/v1/get-username/:id", (req, res) => {
   const userid = req.params.id;
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT id, username FROM users WHERE id=?", [ userid ], (err, rows) => {
+  db.all("SELECT id, username FROM users WHERE id=?", [ userid ], (_, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -99,7 +110,7 @@ app.get("/api/v1/get-username/:id", (req, res) => {
 app.get("/api/v1/get-userinfo/:username", (req, res) => {
   const userid = req.params.username;
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT id, username FROM users WHERE username=?", [ userid ], (err, rows) => {
+  db.all("SELECT id, username FROM users WHERE username=?", [ userid ], (_, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -114,7 +125,7 @@ app.get("/api/v1/get-userinfo/:username", (req, res) => {
 app.get("/api/v1/get-thread-info/:threadid", (req, res) => {
   const threadid = req.params.threadid;
   const db = new sqlite3.Database("./database/forums.db");
-  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (err, rows) => {
+  db.all("SELECT * FROM posts WHERE id=?", [ threadid ], (_, rows) => {
     if (rows.length >= 1) {
       res.send(rows[0]);
       res.status(200);
@@ -133,9 +144,9 @@ app.post("/api/v1/submit-reply", (req, res) => {
   const thread_id = req.body.thread_id;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ username ], (_, rows) => {
     if (rows.length >= 1) {
-      bcrypt.compare(req.body.password, rows[0].password).then(result => {
+      bcrypt.compare(password, rows[0].password).then(result => {
         if (result) {
           const authorid = rows[0].id;
           if (thread_content.length > 1000) {
@@ -145,7 +156,7 @@ app.post("/api/v1/submit-reply", (req, res) => {
             // All Good!!!
             // CREATE TABLE replies (id INTEGER PRIMARY KEY, content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)
             const db = new sqlite3.Database("./database/forums.db");
-            db.run("INSERT INTO replies(id, content, postId, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ thread_content, thread_id, authorid, unixTimestamp ], (err) => {
+            db.run("INSERT INTO replies(id, content, postId, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ converter.makeHtml(thread_content), thread_id, authorid, unixTimestamp ], err => {
               if (err) {
                 res.status(500);
                 res.send({ success: false, error: "Could not successfully insert data into database!" });
@@ -177,9 +188,9 @@ app.post("/api/v1/submit-thread", (req, res) => {
   const thread_content = req.body.thread_content;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ username ], (_, rows) => {
     if (rows.length >= 1) {
-      bcrypt.compare(req.body.password, rows[0].password).then(result => {
+      bcrypt.compare(password, rows[0].password).then(result => {
         if (result) {
           const authorid = rows[0].id;
           // All Good with auth, continue
@@ -193,7 +204,7 @@ app.post("/api/v1/submit-thread", (req, res) => {
             // All Good!!!
             // tablerepliesrepliesCREATE TABLE replies (content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)s�EtablepostspostsCREATE TABLE posts (title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)
             const db = new sqlite3.Database("./database/forums.db");
-            db.run("INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ thread_title, thread_content, authorid, unixTimestamp ], (err) => {
+            db.run("INSERT INTO posts(id, title, content, author, creationDate, editDate) values(NULL, ?, ?, ?, ?, NULL)", [ thread_title, thread_content, authorid, unixTimestamp ], err => {
               if (err) {
                 res.status(500);
                 res.send({ success: false, error: "Could not successfully insert data into database!" });
@@ -226,9 +237,9 @@ app.post("/api/v1/edit-thread", (req, res) => {
   const thread_id = req.body.thread_id;
   const unixTimestamp = Math.round(new Date().getTime() / 1000);
   const db = new sqlite3.Database("./database/users.db");
-  db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
+  db.all("SELECT * FROM users WHERE username=?", [ username ], (_, rows) => {
     if (rows.length >= 1) {
-      bcrypt.compare(req.body.password, rows[0].password).then(result => {
+      bcrypt.compare(password, rows[0].password).then(result => {
         if (result) {
           // All Good with auth, continue
           if (thread_title < 3 || thread_title > 80) {
@@ -284,7 +295,12 @@ app.post("/api/v1/edit-thread", (req, res) => {
   db.close();
 });
 
-app.get("/api/v1/get-all-threads", (req, res) => {
+app.post("/api/v1/edit-reply", (req, res)=>{
+  // let username = req.body.username;
+  // let password = req.body.password;
+});
+
+app.get("/api/v1/get-all-threads", (_, res) => {
   const db = new sqlite3.Database("./database/forums.db");
   const temp = { threads: [] };
   db.serialize(() => {
@@ -307,9 +323,7 @@ app.get("/api/v1/get-all-replies/:id", (req, res) => {
   const temp = { replies: [] };
   db.serialize(() => {
     db.each("SELECT * FROM replies where postId=? ORDER by id DESC", [ id.toString() ], (err, row) => {
-      if (err) {
-        throw err;
-      }
+      if (err) throw err;
       temp.replies.push(row);
     }, () => {
       res.send(temp);
@@ -344,7 +358,7 @@ app.post("/api/v1/signup", (req, res) => {
         res.send({ success: false, error: "incorrect username format." });
       } else {
         const db = new sqlite3.Database("./database/users.db");
-        db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (err, rows) => {
+        db.all("SELECT * FROM users WHERE username=?", [ req.body.username ], (_, rows) => {
           if (rows.length >= 1) {
             res.status(250);
             res.send({ success: false, error: "username already taken." });
@@ -367,7 +381,7 @@ app.post("/api/v1/signup", (req, res) => {
 });
 
 app.listen(config.port, () => {
-  console.log("Listening at https://frionx-forum.frionx.repl.co/");
+  console.log("Listening at https://forum.frionx.xyz/");
 });
 
 // DB Creation Code
@@ -376,28 +390,9 @@ app.listen(config.port, () => {
 dbManage.createDatabase(__dirname+'/database/users.db', 'CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, profile BLOB)');
 
 
-dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT)');
+dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT, author TEXT, creationDate TEXT, editDate TEXT, upvotes INTEGER)');
 
-dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE replies (id INTEGER PRIMARY KEY, content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT)');
+dbManage.createDatabase(__dirname+'/database/forums.db', 'CREATE TABLE replies (id INTEGER PRIMARY KEY, content TEXT, author TEXT, postId TEXT, creationDate TEXT, editDate TEXT, upvotes INTEGER)');
 
 
-/*
-function commandHandle(){
-  let command = rl.question("==> ");
-  switch (command.toLowerCase()){
-    case "create table":
-      dbManage.createDatabase('./database/users.db', 'CREATE TABLE users (username TEXT, password TEXT, profile BLOB)');
-      console.log('done');
-      break;
-    case "drop table":
-      dbManage.runQuery('./database/users.db', 'DROP TABLE users');
-      break;
-    default:
-      console.log("Incorrect command");
-      break;
-  }
-  commandHandle();
-}
-
-commandHandle();
 */

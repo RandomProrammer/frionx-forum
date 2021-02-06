@@ -1,3 +1,7 @@
+let converter = new showdown.Converter();
+function noHTML(a) {
+  return a.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&/g, "&amp;")
+}
 let showLogin = false;
 let showSignup = false;
 
@@ -34,29 +38,28 @@ $("#btn-signup").click(() => {
   }
 });
 
-  $("#btn-form-signup").click(() => {
-    const username = $("#txt-form-username").val();
-    const password = $("#txt-form-password").val();
-    const confirm_password = $("#txt-form-confirm-password").val();
-    fetch("/api/v1/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        confirm_password: confirm_password
-      })
-    }).then((e) => {
-      if (e.success){
-        $("#register-status").text("Successful Signup!");
-      }
-      else {
-        $("#register-status").text(e.error);
-      }
-    });
+$("#btn-form-signup").click(() => {
+  const username = $("#txt-form-username").val();
+  const password = $("#txt-form-password").val();
+  const confirm_password = $("#txt-form-confirm-password").val();
+  fetch("/api/v1/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password,
+      confirm_password: confirm_password
+    })
+  }).then((e) => {
+    if (e.success) {
+      $("#register-status").text("Successful Signup!");
+    } else {
+      $("#register-status").text(e.error);
+    }
   });
+});
 
 $("#btn-form-login").click(() => {
   const username = $("#txt-login-username").val();
@@ -138,13 +141,14 @@ $.get(`/api/v1/get-thread-info/${threadId}`).then(e => {
   document.getElementById("thread-title").innerText = e.title;
   // At this moment you might call me crazy for not making it just text, but textareas dont recognize dom elements breaking any type of XSS!
   // brain
-  document.getElementById("thread-content").innerHTML = e.content;
+  console.log(e.content);
+  document.getElementById("thread-content").innerHTML = converter.makeHtml(noHTML(e.content));
 
   const createD = new Date(Number(e.creationDate) * 1000);
 
   $("#thread-date").text(
     `Created: ${
-    `${createD.toLocaleDateString()} ${createD.getHours()}:${createD.getMinutes()}`}`
+      `${createD.toLocaleDateString()} ${createD.getHours()}:${createD.getMinutes()}`}`
   );
 
   if (e.editDate) {
@@ -162,7 +166,7 @@ $.get(`/api/v1/get-thread-info/${threadId}`).then(e => {
   });
 });
 
-function setName(element, id){
+function setName(element, id) {
   $.get(`/api/v1/get-username/${id}`).then(e=>{
     element.innerText = e.username;
   });
@@ -175,24 +179,24 @@ $.get(`/api/v1/get-all-replies/${threadId}`, {
     document.getElementById("replies").innerHTML += "No replies yet. Why not start the conversation?";
   }
   e.replies.forEach((reply) => {
-      const divForum = document.createElement("div");
-      divForum.setAttribute("class", "forum-content-box miniforum reply-forum");
-      const name = document.createElement("label");
-      name.setAttribute("class", "forum-form-header");
-      name.innerText = reply.author;
-      setName(name, reply.author);
-      const textarea = document.createElement("textarea");
-      let creationDate = document.createElement('label');
-      creationDate.setAttribute('class', 'forum-form-small');
-      const createD = new Date(Number(reply.creationDate) * 1000);
-      creationDate.innerText = new Date(Number(createD)).toLocaleDateString() +" " + createD.getHours()+':'+createD.getMinutes();
-      textarea.setAttribute("class", "forum-input-textarea reply-box");
-      textarea.setAttribute("readonly", "");
-      textarea.innerHTML = reply.content;
-      divForum.append(name);
-      divForum.append(creationDate);
-      divForum.append(textarea);
-      document.getElementById("replies").append(divForum);
+    const divForum = document.createElement("div");
+    divForum.setAttribute("class", "forum-content-box miniforum reply-forum");
+    const name = document.createElement("label");
+    name.setAttribute("class", "forum-form-header");
+    name.innerText = reply.author;
+    setName(name, reply.author);
+    const textarea = document.createElement("textarea");
+    const creationDate = document.createElement("label");
+    creationDate.setAttribute("class", "forum-form-small");
+    const createD = new Date(Number(reply.creationDate) * 1000);
+    creationDate.innerText = `${new Date(Number(createD)).toLocaleDateString() } ${ createD.getHours()}:${createD.getMinutes()}`;
+    textarea.setAttribute("class", "forum-input-textarea reply-box");
+    textarea.setAttribute("readonly", "");
+    textarea.innerHTML = converter.makeHtml(noHTML(reply.content));
+    divForum.append(name);
+    divForum.append(creationDate);
+    divForum.append(textarea);
+    document.getElementById("replies").append(divForum);
   });
 });
 

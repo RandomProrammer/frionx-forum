@@ -21,7 +21,7 @@
         <label class="forum-form-small" id="thread-date"></label>
         <label class="forum-form-small" id="edit-date"></label>
 
-        <textarea id="thread-content" class="forum-input-textarea" readonly></textarea>
+        <div id="thread-content" class="forum-input-textarea" readonly></div>
     </div>
   </div>
   <div class="forum-content-box miniforum" id="commentbox">
@@ -38,6 +38,7 @@
   let threadId = <%= id %>;
   </script>
   <!-- Important Site Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
   <script src="/view-thread.js"></script>
 </body>
 </html>

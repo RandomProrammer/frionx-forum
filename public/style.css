@@ -427,6 +427,7 @@ body, input, textarea, button {
   max-width: 100%;
   min-width: 100%;
   outline: 0;
+  font-weight: lighter;
 }
 
 .forum-input-textarea:hover {

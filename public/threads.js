@@ -28,29 +28,28 @@ $("#btn-signup").click(() => {
   }
 });
 
-  $("#btn-form-signup").click(() => {
-    const username = $("#txt-form-username").val();
-    const password = $("#txt-form-password").val();
-    const confirm_password = $("#txt-form-confirm-password").val();
-    fetch("/api/v1/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-        confirm_password: confirm_password
-      })
-    }).then((e) => {
-      if (e.success){
-        $("#register-status").text("Successful Signup!");
-      }
-      else {
-        $("#register-status").text(e.error);
-      }
-    });
+$("#btn-form-signup").click(() => {
+  const username = $("#txt-form-username").val();
+  const password = $("#txt-form-password").val();
+  const confirm_password = $("#txt-form-confirm-password").val();
+  fetch("/api/v1/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password,
+      confirm_password: confirm_password
+    })
+  }).then((e) => {
+    if (e.success) {
+      $("#register-status").text("Successful Signup!");
+    } else {
+      $("#register-status").text(e.error);
+    }
   });
+});
 
 $("#btn-form-login").click(() => {
   const username = $("#txt-login-username").val();
@@ -76,21 +75,6 @@ $("#btn-form-login").click(() => {
         $("#login-status").text(data.error);
       }
     });
-    /*
-    switch(e.status){
-      case 200:
-        $("#login-status").text("Successfully logged in!");
-        localStorage.setItem('username', username);
-        localStorage.setItem('password', password);
-        setTimeout(window.location.reload(), 1000);
-        break;
-      case 400:
-        $("#login-status").text("Incorrect information provided.");
-        break;
-      default:
-        break;
-    }
-    */
   });
 });
 
